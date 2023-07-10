@@ -25,6 +25,11 @@ start() {
 
 main() {
     COMMAND=$1
+    if ! -f $FILE; then
+      echo "File doesn't exist on filesystem"
+      exit 1
+    fi
+
     if [[ $COMMAND == "run" || $COMMAND == "start" ]]; then
       start
     elif [[ $COMMAND == "reload" ]]; then

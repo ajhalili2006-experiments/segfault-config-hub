@@ -9,6 +9,9 @@ apt-get update
 wget https://prerelease.keybase.io/keybase_amd64.deb -O /tmp/keybase.deb && apt-get install --yes /tmp/keybase.deb && rm /tmp/keybase.deb
 apt-get install --yes keychain ssh-askpass
 
+# install tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
+
 # install code-server
 curl -fsSL https://code-server.dev/install.sh | sh
 

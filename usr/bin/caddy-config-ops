@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -x
+
+FILE=${2:-"/sec/usr/etc/caddy/$HOSTNAME.Caddyfile"}
+
+fmt() {
+    exec caddy fmt --overwrite $FILE
+}
+
+validate() {
+    exec caddy validate --config $FILE --adapter caddyfile
+}
+
+reload() {
+    exec caddy reload --config $FILE --adapter caddyfile
+}
+
+edit() {
+    exec ${EDITOR:-"nano"} $FILE
+}
+
+start() {
+    exec caddy run --config $FILE --adapter caddyfile
+}
+
+main() {
+    COMMAND=$1
+    if [[ $COMMAND == "run" || $COMMAND == "start" ]]; then
+      start
+    elif [[ $COMMAND == "reload" ]]; then
+      reload
+    elif [[ $COMMAND == "format" || $COMMAND == "fmt" ]]; then
+      fmt
+    elif [[ $COMMAND == "validate" || $COMMAND == "check" ]]; then
+      validate
+    elif [[ $COMMAND == "edit" ]]; then
+      edit
+    else
+      echo "Usage: $0 run|reload|format|validate|edit [/path/to/config.Caddyfile]"
+      exit 1
+    fi
+}
+
+main "$*"
+set +x

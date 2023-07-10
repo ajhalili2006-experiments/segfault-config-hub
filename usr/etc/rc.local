@@ -1,0 +1,42 @@
+#! /bin/bash
+
+# This script is executed after the instance has booted up and
+# before the user's shell is spawned.
+
+
+# install keybase
+apt-get update
+wget https://prerelease.keybase.io/keybase_amd64.deb -O /tmp/keybase.deb && apt-get install --yes /tmp/keybase.deb && rm /tmp/keybase.deb
+apt-get install --yes keychain ssh-askpass
+
+# install code-server
+curl -fsSL https://code-server.dev/install.sh | sh
+
+# wakemeops stuff
+curl -sSL https://raw.githubusercontent.com/upciti/wakemeops/main/assets/install_repository | sudo bash
+apt-get update && apt-get install glab github-cli --yes --fix-missing
+
+# setup sshd first
+mkdir -pv /run/sshd
+/usr/sbin/sshd
+
+# Manage your daemons with supervisor
+/usr/bin/supervisord -s -c /sec/usr/etc/supervisor/supervisord.conf
+# Read more: https://www.digitalocean.com/community/tutorials/how-to-install-and-manage-supervisor-on-ubuntu-and-debian-vps
+
+# Or start all your daemons quickly like this:
+# Example:
+# nohup sleep 31337 &>/dev/null &
+#
+# Bash supervisor hack (restart on exit every 10 seconds):
+supervise() {
+    (exec -a "[supervise] $1" bash -c "while :; do $*; sleep 10; done &>/dev/null" &)
+}
+# supervise my-daemon 31337
+# Restart: killall my-daemon
+# Stop   : killall -g my-daemon
+#
+# Or start them the System-V way:
+# service nginx start
+# service postgresql start
+# service pagekite start

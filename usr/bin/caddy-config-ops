@@ -23,16 +23,38 @@ start() {
     exec caddy run --config $FILE --adapter caddyfile
 }
 
+checkForTSFunnel() {
+  dnsNameBase=$(tailscale status --json | jq '.["Self"]["DNSName"]' -r)
+  dnsName=$(sed -E 's/\.+$//gm;t' <<< "$dnsNameBase")
+  funnelStatus=$(tailscale funnel status --json | jq ".[\"AllowFunnel\"][\"$dnsName:443\"]")
+  serveUrlHandlers=$(tailscale serve status --json | jq ".[\"Web\"][\"$dnsName:443\"]")
+  
+  if [[ $funnelStatus == "true" && serveUrlHandlers != "null" ]]; then
+    tsfunnel_active=true
+  fi
+}
+
 main() {
     COMMAND=$1
-    if ! -f $FILE; then
+    if [[ ! -f $FILE ]]; then
       echo "File doesn't exist on filesystem"
       exit 1
     fi
 
+    checkForTSFunnel
+
     if [[ $COMMAND == "run" || $COMMAND == "start" ]]; then
+      if [[ $tsfunnel_active == "true" ]]; then
+        echo "error: Tailscale funnel is active, aborting..."
+        exit 1
+      fi
+
       start
     elif [[ $COMMAND == "reload" ]]; then
+      if [[ $tsfunnel_active == "true" ]]; then
+        echo "error: Tailscale funnel is active, use tailscale <serve|funnel> instead"
+        exit 1
+      fi
       reload
     elif [[ $COMMAND == "format" || $COMMAND == "fmt" ]]; then
       fmt

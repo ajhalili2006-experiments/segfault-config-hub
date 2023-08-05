@@ -3,7 +3,6 @@
 # This script is executed after the instance has booted up and
 # before the user's shell is spawned.
 
-
 # install keybase
 apt-get update
 wget https://prerelease.keybase.io/keybase_amd64.deb -O /tmp/keybase.deb && apt-get install --yes /tmp/keybase.deb && rm /tmp/keybase.deb
@@ -22,6 +21,13 @@ apt-get update && apt-get install glab github-cli --yes --fix-missing
 # setup sshd first
 mkdir -pv /run/sshd
 /usr/sbin/sshd
+
+# border0 experiments
+curl -s -o /usr/local/bin/border0 https://download.border0.com/linux/amd64/border0
+chmod +x /usr/local/bin/border0
+
+# run upgrades first
+DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade --yes
 
 # Manage your daemons with supervisor
 /usr/bin/supervisord -s -c /sec/usr/etc/supervisor/supervisord.conf

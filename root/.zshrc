@@ -259,3 +259,12 @@ fi
 
 # https://github.com/ajhalili2006/dotfiles-modern/blob/ec414976a4885a512218c6c327bf9ff573300dbf/.bashrc#L15
 eval $(keychain --agents gpg,ssh --eval)
+# make sure we can do GPG in command line
+export GPG_TTY=$(tty)
+
+# let use Keybase without desclate permissions, abit dangerous
+# to do this even on disposable root servers like this
+export KEYBASE_ALLOW_ROOT=1
+
+# use nano and code-server as editors
+export EDITOR="nano" VISUAL=code-server

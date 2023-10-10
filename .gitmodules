@@ -1,0 +1,4 @@
+[submodule "web"]
+	path = www
+	url = https://mau.dev/andreijiroh.dev/website
+	branch = main
